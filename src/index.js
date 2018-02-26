@@ -1,39 +1,45 @@
 module.exports = function getZerosCount(number, base) {
 
-    let count = 1;
-    let result;
+    let arrOfDividedBase = [];
+    let flag ;
+    let result = 0;
 
-    let recidue = number;
-    let numberByBase = [];
 
-    function divideN (rec, bs) {
-        numberByBase.push( rec % bs );
-        return (rec - rec % bs) / bs;
+    for( let i = 2; i < base; i++){
+        if( base % i === 0 ) {
+            flag = true;
+            break;
+        } else {
+            flag = false;
+        }
     }
 
-    while (recidue > 0)
-    {
-        recidue = divideN( recidue, base);
+    if( !flag ){
+        for( let i = base; i <= number; i*= base ){
+            result += Math.floor( number / i);
+        }
+    } else {
+
+        let residue = base;
+        let baseOfPow = {};
+        for (let i = 2; i <= base/2; i++) {
+            while (residue % i === 0) {
+                arrOfDividedBase.push(i);
+                residue = residue/i;
+                baseOfPow[i] = arrOfDividedBase.length;
+            }
+
+            arrOfDividedBase = [];
+        }
+
+        let maxPow = Math.max.apply(null, Object.keys( baseOfPow ));
+
+        for (let i = maxPow; i <= number; i *= maxPow) {
+            result += Math.floor(number/i);
+        }
+
+        result = result / baseOfPow[maxPow];
     }
 
-    numberByBase.push( recidue );
-    result = +numberByBase.reverse().join('');
-    //console.log(result);
-
-    let num = result;
-    let divider = 5;
-
-    while ( result >= base )
-    {
-        result = (num - num % divider) / divider;
-        divider = divider * 5;
-        count += result;
-    }
-
-    if( result < 5 && result >= 2 ){
-        count--;
-    }
-
-    //console.log( count );
-    return( count );
+    return Math.floor( result );
 }
